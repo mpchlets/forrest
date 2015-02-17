@@ -26,7 +26,11 @@ function launch_container {
         NAME=`docker inspect $CONTAINER_ID | grep Name | cut -d '"' -f4 | sed "s/\///g"`
 
         echo "Announcing to $ETCD_HOST..."
-        curl -XPUT http://$ETCD_HOST/v2/keys/$ETCD_PREFIX/$NAME -d value="$FORREST_IP:$PORT" &> /dev/null
+        if [ -z $SERVICE_TYPE ]; then
+          curl -XPUT http://$ETCD_HOST/v2/keys/$ETCD_PREFIX/$NAME -d value="$SERVICE_TYPE:$FORREST_IP:$PORT" &> /dev/null
+        else
+          curl -XPUT http://$ETCD_HOST/v2/keys/$ETCD_PREFIX/$NAME -d value="$FORREST_IP:$PORT" &> /dev/null
+        fi
 
         echo "$1 running on Port $PORT with name $NAME"
 }
